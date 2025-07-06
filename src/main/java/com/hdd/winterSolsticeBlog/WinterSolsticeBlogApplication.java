@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * @author haodedong
  */
-@MapperScan("com.hdd.winterSolsticeBlog.mapper") // 指定Mapper接口所在的包路径
+@MapperScan("com.hdd.winterSolsticeBlog.repository") // 指定Mapper接口所在的包路径
 @SpringBootApplication
 public class WinterSolsticeBlogApplication {
 

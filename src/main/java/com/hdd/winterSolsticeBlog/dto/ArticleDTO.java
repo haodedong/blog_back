@@ -30,6 +30,7 @@ public class ArticleDTO {
 
     @ApiModelProperty(value = "分类ID")
     private Integer categoryId;
+
     @ApiModelProperty(value = "标签ID列表")
     private List<Integer> tagIds;
 
@@ -41,5 +42,4 @@ public class ArticleDTO {
 
     @ApiModelProperty(value = "更新时间")
     private LocalDateTime updatedAt;
-
 }

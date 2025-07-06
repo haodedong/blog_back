@@ -2,6 +2,7 @@ package com.hdd.winterSolsticeBlog.config;
 
 import com.hdd.winterSolsticeBlog.filter.JwtAuthenticationFilter;
 import com.hdd.winterSolsticeBlog.service.CustomUserDetailsService;
+import io.swagger.models.HttpMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,7 +52,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/v2/api-docs/**",
                         "/captcha")
                 .anonymous()
-                // .antMatchers("/user/userCategory").authenticated()
+                // 允许所有 GET 请求匿名访问
+                .antMatchers(String.valueOf(HttpMethod.GET), "/**").permitAll()
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
                 .and()
