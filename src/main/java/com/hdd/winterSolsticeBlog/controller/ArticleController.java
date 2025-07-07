@@ -2,70 +2,89 @@ package com.hdd.winterSolsticeBlog.controller;
 
 import com.hdd.winterSolsticeBlog.common.vo.JsonResult;
 import com.hdd.winterSolsticeBlog.common.vo.ResponsePage;
-import com.hdd.winterSolsticeBlog.dto.ArticleDTO;
-import com.hdd.winterSolsticeBlog.dto.request.GetArticlePageListRequest;
 import com.hdd.winterSolsticeBlog.service.ArticleService;
 import com.hdd.winterSolsticeBlog.vo.ArticleVO;
+import com.hdd.winterSolsticeBlog.vo.CategoryVO;
+import com.hdd.winterSolsticeBlog.vo.TagVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Api(tags = "博客文章模块")
 @RestController
-@RequestMapping("/api/blog/articles")
+@RequestMapping("/api/blog")
 public class ArticleController {
     @Autowired
     private ArticleService articleService;
 
     @ApiOperation(value = "获取文章列表")
-    @GetMapping
-    public JsonResult<ResponsePage<ArticleVO>> getArticles(@RequestParam(defaultValue = "1") Integer page,
-                                                           @RequestParam(defaultValue = "10") Integer size) {
-        GetArticlePageListRequest request = new GetArticlePageListRequest();
-        request.setPageNo(page);
-        request.setPageSize(size);
-        return JsonResult.success(articleService.getArticlePageList(request));
+    @GetMapping("/articles")
+    public JsonResult<ResponsePage<ArticleVO>> getArticles(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(required = false) String keyword) {
+        return JsonResult.success(articleService.getArticles(page, size, keyword));
     }
 
-    @ApiOperation(value = "根据ID查询博客文章详情")
-    @GetMapping("/{id}")
-    public JsonResult<ArticleVO> getArticleDetail(@PathVariable(name = "id") Integer id) {
-        return JsonResult.success(articleService.getArticleById(id));
+    @ApiOperation(value = "获取文章详情")
+    @GetMapping("/article/{id}")
+    public JsonResult<ArticleVO> getArticleDetail(@ApiParam(value = "文章ID") @PathVariable Integer id) {
+        return JsonResult.success(articleService.getArticleDetail(id));
     }
+
+    @ApiOperation(value = "获取相关文章")
+    @GetMapping("/article/{id}/related")
+    public JsonResult<List<ArticleVO>> getRelatedArticles(@ApiParam(value = "文章ID") @PathVariable Integer id) {
+        return JsonResult.success(articleService.getRelatedArticles(id));
+    }
+
+    @ApiOperation(value = "切换文章点赞状态")
+    @PostMapping("/article/{id}/like")
+    public JsonResult<Map<String, Object>> toggleArticleLike(@ApiParam(value = "文章ID") @PathVariable Integer id) {
+        return JsonResult.success(articleService.toggleArticleLike(id));
+    }
+
+//    @ApiOperation(value = "获取分类列表")
+//    @GetMapping("/categories")
+//    public JsonResult<List<CategoryVO>> getCategories() {
+//        return JsonResult.success(articleService.getCategories());
+//    }
+
+//    @ApiOperation(value = "获取标签列表")
+//    @GetMapping("/tags")
+//    public JsonResult<List<TagVO>> getTags() {
+//        return JsonResult.success(articleService.getTags());
+//    }
 
     @ApiOperation(value = "根据分类获取文章")
-    @GetMapping("/category/{category}")
-    public JsonResult<ResponsePage<ArticleVO>> getArticlesByCategory(@PathVariable String category,
-                                                                     @RequestParam(defaultValue = "1") Integer page,
-                                                                     @RequestParam(defaultValue = "10") Integer size) {
+    @GetMapping("/articles/category/{category}")
+    public JsonResult<ResponsePage<ArticleVO>> getArticlesByCategory(
+            @ApiParam(value = "分类ID") @PathVariable Integer category,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
         return JsonResult.success(articleService.getArticlesByCategory(category, page, size));
     }
 
     @ApiOperation(value = "根据标签获取文章")
-    @GetMapping("/tag/{tag}")
-    public JsonResult<ResponsePage<ArticleVO>> getArticlesByTag(@PathVariable String tag,
-                                                                @RequestParam(defaultValue = "1") Integer page,
-                                                                @RequestParam(defaultValue = "10") Integer size) {
+    @GetMapping("/articles/tag/{tag}")
+    public JsonResult<ResponsePage<ArticleVO>> getArticlesByTag(
+            @ApiParam(value = "标签ID") @PathVariable Integer tag,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
         return JsonResult.success(articleService.getArticlesByTag(tag, page, size));
     }
 
     @ApiOperation(value = "搜索文章")
-    @GetMapping("/search")
-    public JsonResult<ResponsePage<ArticleVO>> searchArticles(@RequestParam String keyword,
-                                                              @RequestParam(defaultValue = "1") Integer page,
-                                                              @RequestParam(defaultValue = "10") Integer size) {
+    @GetMapping("/articles/search")
+    public JsonResult<ResponsePage<ArticleVO>> searchArticles(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
         return JsonResult.success(articleService.searchArticles(keyword, page, size));
-    }
-
-    @ApiOperation(value = "保存博客文章")
-    @PostMapping("/")
-    public JsonResult<Void> saveArticle(@Validated @RequestBody ArticleDTO request) {
-        articleService.checkArticleInfo(request);
-        articleService.saveOrUpdateArticle(request);
-        return JsonResult.success(null);
     }
 }
